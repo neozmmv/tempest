@@ -1,0 +1,12 @@
+import { Hono } from "hono";
+
+const app = new Hono()
+
+app.get("/", (c) => {
+    return c.json({})
+})
+
+export default { 
+    port: 3000, 
+    fetch: app.fetch, 
+} 

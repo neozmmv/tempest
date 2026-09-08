@@ -1,0 +1,34 @@
+services:
+  db:
+    image: postgres:18-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_DB: ${APP_DB}
+    ports: #POSTGRES PORT
+      - "5434:5432"
+    volumes:
+      - db_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${APP_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  postgrest:
+    image: postgrest/postgrest:latest
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      PGRST_DB_URI: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${APP_DB}
+      PGRST_DB_SCHEMA: public
+      PGRST_DB_ANON_ROLE: ${DB_USER}
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:3245
+    ports: #POSTGREST PORT
+      - "3245:3000"
+
+volumes:
+  db_data:     
