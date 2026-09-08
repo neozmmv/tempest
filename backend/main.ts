@@ -7,19 +7,20 @@ app.get("/", (c) => {
     return c.json({})
 })
 
+// /login
 app.post("/login", async (c: Context) => {
     let errors: string[] = [] 
     const body = await c.req.json() as LoginForm;
 
     if(!body.email) {
-        errors.push("Email necessario para busca")
+        errors.push("Email required")
     }
 
     if(!body.password) {
-        errors.push("Senha necessaria para busca")
+        errors.push("Password required")
     }
 
-    // buscar usuario
+    // seatch user
     const res = await fetch(`http://localhost:3245/users?email=eq.${body.email}`)
     const users = await res.json() as User[]
     const user = users[0]!
@@ -29,16 +30,16 @@ app.post("/login", async (c: Context) => {
         return c.json({errors})
     }
     
-    // checagem dos hashes
+    // hash validation
     if (isValid) {
-        // LOGICA DO TOKEN JWT / COOKIE
+        // jwt / cookie
         return c.json({user}, 200)
     } else {
         return c.json({ok: false}, 401)
     }
 })
 
-// rota de sign up
+// sign up
 app.post("/signUp", async (c) => {
     const body = await c.req.json() as User;
     const hash = await Bun.password.hash(body.password, {algorithm: "bcrypt", cost: 10})
