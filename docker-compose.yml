@@ -7,7 +7,7 @@ services:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${APP_DB}
     ports: #POSTGRES PORT
-      - "5434:5432"
+      - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql
     healthcheck:
@@ -26,9 +26,9 @@ services:
       PGRST_DB_URI: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${APP_DB}
       PGRST_DB_SCHEMA: public
       PGRST_DB_ANON_ROLE: ${DB_USER}
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:3245
+      PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:3001
     ports: #POSTGREST PORT
-      - "3245:3000"
+      - "3001:3000"
 
 volumes:
   db_data:     
