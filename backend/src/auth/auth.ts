@@ -1,11 +1,14 @@
 import { Context, Hono } from "hono";
 import type { LoginBody } from "../../interfaces/LoginBody";
-import { decode, sign, verify } from 'hono/jwt'
+import { sign, verify } from 'hono/jwt'
+import { setCookie, getCookie } from "hono/cookie";
 import { db } from "../../db";
 import { users } from "../../db/schema";
 import { eq } from "drizzle-orm";
-import { password } from "bun";
 import type { User } from "../../interfaces/Users";
+import { JWT_SECRET } from "../../constants";
+import type { JwtPayload } from "../../interfaces/JwtPayload";
+import { JwtTokenExpired } from "hono/utils/jwt/types";
 
 export const authRouter = new Hono();
 
@@ -54,12 +57,22 @@ authRouter.post("/login", async (c: Context) => {
         name: user.name,
         email: user.email,
         created_at: user.created_at,
-        exp: Math.floor(Date.now() / 1000) + 60 * 5 // token expires in 5 min
+        exp: Math.floor(Date.now() / 1000) + 60 * 5, // token expires in 5 min
+        aud: "tempest-users",
+        issuer: "tempest"
     }
 
     const token = await sign(payload, Bun.env.JWT_SECRET!, "HS256")
 
-    return c.json({token});
+    setCookie(c, "jwt", token, {
+        path: "/",
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7 // cookie saved for 7 days
+    })
+
+    return c.json({});
 })
 
 authRouter.post("/signUp", async (c: Context) => {
@@ -100,4 +113,21 @@ authRouter.post("/signUp", async (c: Context) => {
     }
     
     return c.json(userToReturn)
+})
+
+authRouter.get("/me", async (c: Context) => {
+    const token = getCookie(c, "jwt");
+    if(!token) {
+        return c.json({}, 401)
+    }
+    let valid: JwtPayload;
+    try {
+        valid = await verify(token, JWT_SECRET, "HS256") as JwtPayload
+    } catch (err) {
+        if(err instanceof JwtTokenExpired) {
+            return c.json({error: "Expired token!"}, 401)
+        }
+        return c.json({}, 401)
+    }
+    return c.json({ok: true})
 })
