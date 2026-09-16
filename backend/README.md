@@ -12,4 +12,10 @@ To run:
 bun run index.ts
 ```
 
+```bash
+bun db:migrate
+bun db:generate
+bun db:push
+```
+
 This project was created using `bun init` in bun v1.4.0. [Bun](https://bun.com) is a fast all-in-one JavaScript runtime.

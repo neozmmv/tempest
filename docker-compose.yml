@@ -6,7 +6,7 @@ services:
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${APP_DB}
-    ports: #POSTGRES PORT
+    ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql
@@ -15,20 +15,6 @@ services:
       interval: 5s
       timeout: 5s
       retries: 5
-
-  postgrest:
-    image: postgrest/postgrest:latest
-    restart: unless-stopped
-    depends_on:
-      db:
-        condition: service_healthy
-    environment:
-      PGRST_DB_URI: postgres://${DB_USER}:${DB_PASSWORD}@db:5432/${APP_DB}
-      PGRST_DB_SCHEMA: public
-      PGRST_DB_ANON_ROLE: ${DB_USER}
-      PGRST_OPENAPI_SERVER_PROXY_URI: http://localhost:3001
-    ports: #POSTGREST PORT
-      - "3001:3000"
 
 volumes:
   db_data:     
