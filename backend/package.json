@@ -12,7 +12,7 @@
     "typescript": "^7"
   },
   "scripts": {
-    "dev": "bun --watch main.ts",
+    "dev": "bun --watch ./src/main.ts",
     "db:generate": "bun --env-file=../.env drizzle-kit generate",
     "db:migrate": "bun --env-file=../.env drizzle-kit migrate",
     "db:push": "bun --env-file=../.env drizzle-kit push",

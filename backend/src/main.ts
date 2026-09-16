@@ -1,5 +1,5 @@
 import { Hono, Context } from "hono";
-import type { LoginForm, User } from "./interfaces/Users";
+import type { LoginForm, User } from "../interfaces/Users";
 
 const app = new Hono()
 
