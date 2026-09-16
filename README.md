@@ -9,8 +9,7 @@ bun dev
 
 ## Routes
 ```
-POST /signUp
-POST /login
+POST /auth/signUp
+POST /auth/login
+GET  /auth/me
 ```
-
-`NOTIFY pgrst, 'reload schema';`
