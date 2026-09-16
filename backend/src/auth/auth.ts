@@ -9,6 +9,7 @@ import type { User } from "../../interfaces/Users";
 import { JWT_SECRET } from "../../constants";
 import type { JwtPayload } from "../../interfaces/JwtPayload";
 import { JwtTokenExpired } from "hono/utils/jwt/types";
+import { authMiddleware } from "./middleware";
 
 export const authRouter = new Hono();
 
@@ -115,19 +116,6 @@ authRouter.post("/signUp", async (c: Context) => {
     return c.json(userToReturn)
 })
 
-authRouter.get("/me", async (c: Context) => {
-    const token = getCookie(c, "jwt");
-    if(!token) {
-        return c.json({}, 401)
-    }
-    let valid: JwtPayload;
-    try {
-        valid = await verify(token, JWT_SECRET, "HS256") as JwtPayload
-    } catch (err) {
-        if(err instanceof JwtTokenExpired) {
-            return c.json({error: "Expired token!"}, 401)
-        }
-        return c.json({}, 401)
-    }
+authRouter.get("/me", authMiddleware, async (c: Context) => {
     return c.json({ok: true})
 })
