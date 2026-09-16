@@ -1,11 +1,28 @@
 import { Hono, Context } from "hono";
 import type { LoginForm, User } from "../interfaces/Users";
+import { db } from "../db";
+import { users } from "../db/schema";
+import { authRouter } from "./auth/auth";
 
 const app = new Hono()
+
+app.route("/auth", authRouter)
 
 app.get("/", (c) => {
     return c.json({})
 })
+
+// drizzle calls need await!!
+
+/* app.post("/db", async (c) => {
+    const user = await c.req.json() as User
+    const dbres = await db.insert(users).values({
+        name: user.name,
+        email: user.email,
+        password: user.password,
+    })
+    return c.json({})
+}) */
 
 // /login
 app.post("/login", async (c: Context) => {
