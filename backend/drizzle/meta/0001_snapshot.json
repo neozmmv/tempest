@@ -1,6 +1,6 @@
 {
-  "id": "3798096d-5a3d-490b-957f-355c275a2c82",
-  "prevId": "00000000-0000-0000-0000-000000000000",
+  "id": "52813e1f-f2a1-4364-82cc-a62e388c83cc",
+  "prevId": "3798096d-5a3d-490b-957f-355c275a2c82",
   "version": "7",
   "dialect": "postgresql",
   "tables": {
@@ -101,6 +101,48 @@
         },
         "password": {
           "name": "password",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "public_key": {
+          "name": "public_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encrypted_private_key": {
+          "name": "encrypted_private_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "public_signature_key": {
+          "name": "public_signature_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encrypted_private_signature_key": {
+          "name": "encrypted_private_signature_key",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encryption_salt": {
+          "name": "encryption_salt",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "encryption_nonce": {
+          "name": "encryption_nonce",
+          "type": "text",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "signature_nonce": {
+          "name": "signature_nonce",
           "type": "text",
           "primaryKey": false,
           "notNull": true

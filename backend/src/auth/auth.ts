@@ -5,11 +5,10 @@ import { setCookie, getCookie } from "hono/cookie";
 import { db } from "../../db";
 import { users } from "../../db/schema";
 import { eq } from "drizzle-orm";
-import type { User } from "../../interfaces/Users";
 import { JWT_SECRET } from "../../constants";
-import type { JwtPayload } from "../../interfaces/JwtPayload";
-import { JwtTokenExpired } from "hono/utils/jwt/types";
 import { authMiddleware } from "./middleware";
+import { zValidator } from "../lib/validator";
+import { signUpRequestSchema } from "../schemas/signup.schema";
 
 export const authRouter = new Hono();
 
@@ -33,7 +32,7 @@ authRouter.post("/login", async (c: Context) => {
         password: users.password,
         name: users.name,
         email: users.email,
-        created_at: users.created_at
+        created_at: users.createdAt
     })
     .from(users)
     .where(eq(users.email, body.email))
@@ -63,7 +62,7 @@ authRouter.post("/login", async (c: Context) => {
         issuer: "tempest"
     }
 
-    const token = await sign(payload, Bun.env.JWT_SECRET!, "HS256")
+    const token = await sign(payload, JWT_SECRET, "HS256")
 
     setCookie(c, "jwt", token, {
         path: "/",
@@ -76,26 +75,8 @@ authRouter.post("/login", async (c: Context) => {
     return c.json({});
 })
 
-authRouter.post("/signUp", async (c: Context) => {
-    const body = await c.req.json() as User;
-    const errors: string[] = []
-    if(!body.email) {
-        errors.push("'email' field required!")
-    }
-    if(!body.name) {
-        errors.push("'name' field required!")
-    }
-    if(!body.password) {
-        errors.push("'password' field required!")
-    }
-    if(body.password.length < 8) {
-        errors.push("Password should be at least 8 characters long!")
-    }
-
-    if(errors.length > 0) {
-        return c.json({errors})
-    }
-
+authRouter.post("/signUp", zValidator("json", signUpRequestSchema), async (c) => {
+    const body = c.req.valid("json")
     const hashedPassword = await Bun.password.hash(body.password)
 
     const [user] = await db
@@ -103,14 +84,21 @@ authRouter.post("/signUp", async (c: Context) => {
         .values({
             name: body.name,
             email: body.email,
-            password: hashedPassword
+            password: hashedPassword,
+            publicKey: body.publicKey,
+            encryptedPrivateKey: body.encryptedPrivateKey,
+            encryptedPrivateSignatureKey: body.encryptedPrivateSignatureKey,
+            encryptionNonce: body.encryptionNonce,
+            encryptionSalt: body.encryptionSalt,
+            publicSignatureKey: body.publicSignatureKey,
+            signatureNonce: body.signatureNonce,
         })
         .returning()
 
     const userToReturn = {
         name: user?.name,
         email: user?.email,
-        created_at: user?.created_at
+        created_at: user?.createdAt
     }
     
     return c.json(userToReturn)
