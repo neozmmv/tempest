@@ -41,17 +41,18 @@ const signatureNonce = randomBytes(12);
 const encryptedPrivateX = gcm(derivedKey, encryptionNonce).encrypt(Uint8Array.fromBase64(x25519kp.private))
 const encryptedPrivateED = gcm(derivedKey, signatureNonce).encrypt(Uint8Array.fromBase64(ed25519kp.private))
 
-
+// POST /auth/signUp
+// body
 console.log(`
-NAME: ${name}
-EMAIL: ${email}
-PASSWORD: ${password}
-PUBLIC KEY (X): ${x25519kp.public}
-ENCRYPTED KEY (X): ${encryptedPrivateX.toBase64()}
-ENCRYPTED KEY (ED): ${encryptedPrivateED.toBase64()}
-PUBLIC KEY (ED): ${ed25519kp.public}
-ENCRYPTION NONCE: ${encryptionNonce.toBase64()}
-SALT: ${salt.toBase64()}
-SIGNATURE NONCE: ${signatureNonce.toBase64()}
-
-`)
+{
+  "name": "${name}",
+  "email": "${email}",
+  "password": "${password}",
+  "publicKey": "${x25519kp.public}",
+  "encryptedPrivateKey": "${encryptedPrivateX.toBase64()}",
+  "publicSignatureKey": "${ed25519kp.public}",
+  "encryptedPrivateSignatureKey": "${encryptedPrivateED.toBase64()}",
+  "encryptionSalt": "${salt.toBase64()}",
+  "encryptionNonce": "${encryptionNonce.toBase64()}",
+  "signatureNonce": "${signatureNonce.toBase64()}"
+}`)

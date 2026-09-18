@@ -5,7 +5,7 @@ import { setCookie, getCookie } from "hono/cookie";
 import { db } from "../../db";
 import { users } from "../../db/schema";
 import { eq } from "drizzle-orm";
-import { JWT_SECRET } from "../../constants";
+import { AUDIENCE, ISSUER, JWT_SECRET } from "../../constants";
 import { authMiddleware } from "./middleware";
 import { zValidator } from "../lib/validator";
 import { signUpRequestSchema } from "../schemas/signup.schema";
@@ -58,8 +58,8 @@ authRouter.post("/login", async (c: Context) => {
         email: user.email,
         created_at: user.created_at,
         exp: Math.floor(Date.now() / 1000) + 60 * 5, // token expires in 5 min
-        aud: "tempest-users",
-        issuer: "tempest"
+        aud: AUDIENCE,
+        issuer: ISSUER
     }
 
     const token = await sign(payload, JWT_SECRET, "HS256")
@@ -94,6 +94,26 @@ authRouter.post("/signUp", zValidator("json", signUpRequestSchema), async (c) =>
             signatureNonce: body.signatureNonce,
         })
         .returning()
+
+        const payload = {
+        sub: user?.id,
+        name: user?.name,
+        email: user?.email,
+        created_at: user?.createdAt,
+        exp: Math.floor(Date.now() / 1000) + 60 * 5, // token expires in 5 min
+        aud: AUDIENCE,
+        issuer: ISSUER
+    }
+
+    const token = await sign(payload, JWT_SECRET, "HS256")
+
+    setCookie(c, "jwt", token, {
+        path: "/",
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: 60 * 60 * 24 * 7 // cookie saved for 7 days
+    })
 
     const userToReturn = {
         name: user?.name,
