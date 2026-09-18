@@ -96,14 +96,14 @@ authRouter.post("/signUp", zValidator("json", signUpRequestSchema), async (c) =>
         .returning()
 
         const payload = {
-        sub: user?.id,
-        name: user?.name,
-        email: user?.email,
-        created_at: user?.createdAt,
-        exp: Math.floor(Date.now() / 1000) + 60 * 5, // token expires in 5 min
-        aud: AUDIENCE,
-        issuer: ISSUER
-    }
+            sub: user?.id,
+            name: user?.name,
+            email: user?.email,
+            created_at: user?.createdAt,
+            exp: Math.floor(Date.now() / 1000) + 60 * 5, // token expires in 5 min
+            aud: AUDIENCE,
+            issuer: ISSUER
+        }
 
     const token = await sign(payload, JWT_SECRET, "HS256")
 

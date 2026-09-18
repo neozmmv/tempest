@@ -3,10 +3,13 @@ import type { ILoginForm, IUser } from "../interfaces/Users";
 import { db } from "../db";
 import { users } from "../db/schema";
 import { authRouter } from "./auth/auth";
+import { ws } from "./message/messagews";
+import { websocket } from "hono/bun";
 
 const app = new Hono()
 
 app.route("/auth", authRouter)
+app.route("/message", ws) // ws
 
 app.get("/", (c) => {
     return c.json({})
@@ -16,5 +19,6 @@ app.get("/", (c) => {
 
 export default { 
     port: 3000, 
-    fetch: app.fetch, 
+    fetch: app.fetch,
+    websocket
 } 
