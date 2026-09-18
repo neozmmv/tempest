@@ -88,9 +88,9 @@ authRouter.post("/signUp", zValidator("json", signUpRequestSchema), async (c) =>
             publicKey: body.publicKey,
             encryptedPrivateKey: body.encryptedPrivateKey,
             encryptedPrivateSignatureKey: body.encryptedPrivateSignatureKey,
+            publicSignatureKey: body.publicSignatureKey,
             encryptionNonce: body.encryptionNonce,
             encryptionSalt: body.encryptionSalt,
-            publicSignatureKey: body.publicSignatureKey,
             signatureNonce: body.signatureNonce,
         })
         .returning()

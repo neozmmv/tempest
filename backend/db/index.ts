@@ -3,4 +3,4 @@ import * as schema from "./schema";
 import { connectionString } from "../constants";
 
 
-export const db = drizzle(connectionString, { schema });
+export const db = drizzle(connectionString, { schema, casing: "snake_case" });
